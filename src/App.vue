@@ -4,12 +4,9 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   name: 'App',
-};
+}
 </script>
 
-<style>
-/* Add global styles if needed */
-</style>

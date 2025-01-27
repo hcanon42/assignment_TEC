@@ -7,44 +7,44 @@
   </div>
 </template>
 
-<script>
-import { computed } from 'vue';
-import { useStore } from 'vuex';
+<script lang="ts">
+import { computed } from 'vue'
+import { useStore } from 'vuex'
 
 export default {
   setup() {
-    const store = useStore();
+    const store = useStore()
 
-    const route = computed(() => store.state.route);
-    const selectedSpacecraft = computed(() => store.state.selectedSpacecraft);
-    const passengers = computed(() => store.state.passengers);
+    const route = computed(() => store.state.route)
+    const selectedSpacecraft = computed(() => store.state.selectedSpacecraft)
+    const passengers = computed(() => store.state.passengers)
 
     const totalDistance = computed(() =>
-      route.value.reduce((sum, planet) => sum + planet.distance, 0)
-    );
+      route.value.reduce((sum, planet) => sum + planet.distance, 0),
+    )
 
     const remainingRange = computed(() => {
-      if (!selectedSpacecraft.value) return 0;
+      if (!selectedSpacecraft.value) return 0
 
       const baseRange =
         selectedSpacecraft.value.range -
         passengers.value * 70 -
-        route.value.length * selectedSpacecraft.value.deltaR;
+        route.value.length * selectedSpacecraft.value.deltaR
 
-      return Math.max(baseRange - totalDistance.value, 0);
-    });
+      return Math.max(baseRange - totalDistance.value, 0)
+    })
 
     const saveMission = () => {
       const plan = {
         spacecraft: selectedSpacecraft.value,
         passengers: passengers.value,
         route: route.value,
-      };
-      store.commit('savePlan', plan);
-      alert('Mission saved!');
-    };
+      }
+      store.commit('savePlan', plan)
+      alert('Mission saved!')
+    }
 
-    return { totalDistance, remainingRange, saveMission };
+    return { totalDistance, remainingRange, saveMission }
   },
-};
+}
 </script>

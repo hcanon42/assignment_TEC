@@ -1,4 +1,4 @@
-import YAML from 'yaml';
+import YAML from 'yaml'
 
 /**
  * Loads a YAML file and converts it into a JSON object.
@@ -9,18 +9,18 @@ export async function loadYamlAsJson<T>(): Promise<T> {
 
   try {
     // Fetch the YAML file
-    const response = await fetch(yamlDataFilePath);
+    const response = await fetch(yamlDataFilePath)
 
     if (!response.ok) {
-      throw new Error(`Failed to load file at ${yamlDataFilePath}: ${response.statusText}`);
+      throw new Error(`Failed to load file at ${yamlDataFilePath}: ${response.statusText}`)
     }
 
     // Parse the YAML content
-    const yamlText = await response.text();
-    const jsonObject = YAML.parse(yamlText);
-    return jsonObject as T;
+    const yamlText = await response.text()
+    const jsonObject = YAML.parse(yamlText)
+    return jsonObject as T
   } catch (error) {
-    console.error(`Error loading or parsing YAML file: ${error}`);
-    throw error;
+    console.error(`Error loading or parsing YAML file: ${error}`)
+    throw error
   }
 }
