@@ -3,19 +3,20 @@
     <h1 class="text-3xl font-bold mb-6">Mission Planner</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Spacecraft Selection -->
-      <div class="section p-4 border rounded shadow">
-        <SpacecraftSelector />
-      </div>
 
       <!-- Passenger Selection -->
       <div class="section p-4 border rounded shadow">
         <PassengerSelector />
       </div>
 
+      <!-- Spacecraft Selection -->
+      <div class="section p-4 border rounded shadow">
+        <SpacecraftSelector :spacecraftOptions="spacecraftOptions"/>
+      </div>
+
       <!-- Route Planner -->
       <div class="section md:col-span-2 p-4 border rounded shadow">
-        <RoutePlanner />
+        <RoutePlanner :planets="planets"/>
       </div>
 
       <!-- Route Summary -->
@@ -31,8 +32,35 @@ import SpacecraftSelector from "../components/SpacecraftSelector.vue";
 import PassengerSelector from "../components/PassengerSelector.vue";
 import RoutePlanner from "../components/RoutePlanner.vue";
 import RouteSummary from "../components/RouteSummary.vue";
+import {loadYamlAsJson} from "../utils/yamlReader.ts";
+import {onMounted, ref} from "vue";
 
 export default {
+  setup() {
+    const spacecraftOptions = ref(null);
+    const planets = ref(null);
+
+    const sortSpacecraftsByCapacity = (spacecrafts) => {
+      return spacecrafts.sort((a, b) => a.capacity - b.capacity);
+    }
+
+    const sortPlanetsByDistanceToTheSun = (planets) => {
+      return planets.sort((a, b) => a.distance_from_sun_km - b.distance_from_sun_km);
+    }
+
+    onMounted(async () => {
+      const data = await loadYamlAsJson();
+      if (!data.spacecrafts || !data.planets) {
+        console.error("incomplete data, unable to load properly", data);
+        return;
+      }
+      spacecraftOptions.value = sortSpacecraftsByCapacity(data.spacecrafts);
+      planets.value = sortPlanetsByDistanceToTheSun(data.planets);
+    });
+
+    return {spacecraftOptions, planets};
+  },
+
   components: {
     SpacecraftSelector,
     PassengerSelector,
@@ -44,8 +72,8 @@ export default {
 
 <style scoped>
 .mission-planner {
-  max-width: 800px;
-  margin: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .section {

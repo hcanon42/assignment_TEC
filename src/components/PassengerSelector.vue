@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h2>Number of Passengers</h2>
-    <input type="number" v-model="passengers" @input="onInput" />
+    <h2>Select number of passengers</h2>
+    <input type="number" v-model="selectedNumberOfPassengers" @input="onInput" min="1" />
   </div>
 </template>
 
@@ -13,16 +13,16 @@ export default {
   setup() {
     const store = useStore();
 
-    const passengers = computed({
-      get: () => store.state.passengers,
-      set: (value) => store.commit('setPassengers', value),
+    const selectedNumberOfPassengers = computed({
+      get: () => store.state.selectedNumberOfPassengers,
+      set: (value) => store.commit('setSelectedNumberOfPassengers', value),
     });
 
     const onInput = () => {
-      store.commit('setPassengers', parseInt(passengers.value));
+      store.commit('setSelectedNumberOfPassengers', parseInt(selectedNumberOfPassengers.value));
     };
 
-    return { passengers, onInput };
+    return { selectedNumberOfPassengers, onInput };
   },
 };
 </script>

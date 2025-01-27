@@ -1,28 +1,22 @@
 import { createStore } from 'vuex';
+import {loadYamlAsJson} from "@/utils/yamlReader.ts";
 
 export default createStore({
   state: {
-    spacecrafts: [],
-    planets: [],
     selectedSpacecraft: null,
-    passengers: 0,
+    selectedNumberOfPassengers: 1,
     route: [],
     savedPlans: [],
   },
   mutations: {
-    setSpacecrafts(state, spacecrafts) {
-      state.spacecrafts = spacecrafts;
+    setSelectedSpacecraft(state, selectedSpacecraft: Object) {
+      state.selectedSpacecraft = selectedSpacecraft;
     },
-    setPlanets(state, planets) {
-      state.planets = planets;
+
+    setSelectedNumberOfPassengers(state, selectedNumberOfPassengers: number) {
+      state.selectedNumberOfPassengers = selectedNumberOfPassengers;
     },
-    setSelectedSpacecraft(state, spacecraft) {
-      state.selectedSpacecraft = spacecraft;
-    },
-    setPassengers(state, passengers) {
-      state.passengers = passengers;
-    },
-    addPlanetToRoute(state, planet) {
+    addPlanetToRoute(state, planet: Object) {
       state.route.push(planet);
     },
     savePlan(state, plan) {
