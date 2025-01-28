@@ -11,6 +11,10 @@
         <div>
           <SpacecraftSelector :spacecraftOptions="spacecraftOptions" />
         </div>
+
+        <div>
+          <MissionSummary />
+        </div>
       </div>
 
       <div class="column">
@@ -27,11 +31,11 @@
 import SpacecraftSelector from '../components/SpacecraftSelector.vue'
 import PassengerSelector from '../components/PassengerSelector.vue'
 import RoutePlanner from '../components/RoutePlanner.vue'
-import RouteSummary from '../components/RouteSummary.vue'
 import { loadYamlAsJson } from '../utils/yamlReader.ts'
 import { onMounted, ref } from 'vue'
 import type {Spacecraft} from "@/types/Spacecraft.ts";
 import type {Planet} from "@/types/Planet.ts";
+import MissionSummary from "@/components/MissionSummary.vue";
 
 export default {
   setup() {
@@ -60,10 +64,11 @@ export default {
   },
 
   components: {
+    MissionSummary,
     SpacecraftSelector,
     PassengerSelector,
     RoutePlanner,
-    RouteSummary,
+    RouteSummary: MissionSummary,
   },
 }
 </script>
