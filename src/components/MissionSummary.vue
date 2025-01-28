@@ -1,10 +1,6 @@
 <template>
   <div
-    v-if="
-      store.state.departurePlanet &&
-      store.state.endPlanet &&
-      store.state.missionDuration
-    "
+    v-if="store.state.departurePlanet && store.state.endPlanet && store.state.missionDuration"
     class="mission-summary-container"
   >
     <h2>Mission Summary</h2>
@@ -18,7 +14,7 @@
         {{
           Math.abs(
             store.state.departurePlanet.distance_from_sun_km -
-            store.state.endPlanet.distance_from_sun_km
+              store.state.endPlanet.distance_from_sun_km,
           ) / MILLION
         }}
       </b>
@@ -28,35 +24,33 @@
       <b>{{ Math.round(store.state.missionDuration / AVERAGE_NUMBER_OF_HOURS_IN_A_MONTH) }}</b>
       months
     </p>
-    <p>Number of passengers: <b>{{ store.state.selectedNumberOfPassengers }}</b></p>
-    <p>Spacecraft: <b>{{ store.state.selectedSpacecraft.name }}</b></p>
+    <p>
+      Number of passengers: <b>{{ store.state.selectedNumberOfPassengers }}</b>
+    </p>
+    <p>
+      Spacecraft: <b>{{ store.state.selectedSpacecraft.name }}</b>
+    </p>
 
     <div class="mission-name-input">
       <label for="missionName">Mission Name:</label>
-      <input
-        type="text"
-        v-model="missionName"
-        placeholder="Enter mission name"
-      />
-      <button @click="saveMission" :disabled="!missionName.trim()">
-        Save this mission
-      </button>
+      <input type="text" v-model="missionName" placeholder="Enter mission name" />
+      <button @click="saveMission" :disabled="!missionName.trim()">Save this mission</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { useStore } from "vuex";
-import type { Mission } from "@/types/Mission.ts";
-import { ref } from "vue";
+import { useStore } from 'vuex'
+import type { Mission } from '@/types/Mission.ts'
+import { ref } from 'vue'
 
 export default {
   setup() {
-    const MILLION = 1000000;
-    const AVERAGE_NUMBER_OF_HOURS_IN_A_MONTH = 720;
-    const store = useStore();
+    const MILLION = 1000000
+    const AVERAGE_NUMBER_OF_HOURS_IN_A_MONTH = 720
+    const store = useStore()
 
-    const missionName = ref<string>("");
+    const missionName = ref<string>('')
 
     const saveMission = () => {
       const currentMission: Mission = {
@@ -65,15 +59,12 @@ export default {
         endPlanet: store.state.endPlanet,
         selectedNumberOfPassengers: store.state.selectedNumberOfPassengers,
         selectedSpacecraft: store.state.selectedSpacecraft,
-      };
+      }
 
-      store.state.savedMissions.push(currentMission);
-      localStorage.setItem(
-        "savedMissions",
-        JSON.stringify(store.state.savedMissions)
-      );
-      missionName.value = "";
-    };
+      store.state.savedMissions.push(currentMission)
+      localStorage.setItem('savedMissions', JSON.stringify(store.state.savedMissions))
+      missionName.value = ''
+    }
 
     return {
       store,
@@ -81,9 +72,9 @@ export default {
       AVERAGE_NUMBER_OF_HOURS_IN_A_MONTH,
       MILLION,
       saveMission,
-    };
+    }
   },
-};
+}
 </script>
 
 <style>

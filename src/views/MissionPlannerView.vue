@@ -26,7 +26,6 @@
           <RoutePlanner :planets="planets" />
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -37,10 +36,10 @@ import PassengerSelector from '../components/PassengerSelector.vue'
 import RoutePlanner from '../components/RoutePlanner.vue'
 import { loadYamlAsJson } from '../utils/yamlReader.ts'
 import { onMounted, ref } from 'vue'
-import type {Spacecraft} from "@/types/Spacecraft.ts";
-import type {Planet} from "@/types/Planet.ts";
-import MissionSummary from "@/components/MissionSummary.vue";
-import MissionLoader from "@/components/MissionLoader.vue";
+import type { Spacecraft } from '@/types/Spacecraft.ts'
+import type { Planet } from '@/types/Planet.ts'
+import MissionSummary from '@/components/MissionSummary.vue'
+import MissionLoader from '@/components/MissionLoader.vue'
 
 export default {
   setup() {
@@ -74,7 +73,6 @@ export default {
     SpacecraftSelector,
     PassengerSelector,
     RoutePlanner,
-    RouteSummary: MissionSummary,
   },
 }
 </script>

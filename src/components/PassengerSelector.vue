@@ -1,7 +1,13 @@
 <template>
   <div class="passenger-selector">
     <h2>Select number of passengers</h2>
-    <input type="number" v-model="selectedNumberOfPassengers" @input="onInput" min="1" class="passenger-input" />
+    <input
+      type="number"
+      v-model="selectedNumberOfPassengers"
+      @input="onInput"
+      min="1"
+      class="passenger-input"
+    />
   </div>
 </template>
 

@@ -8,27 +8,25 @@
       <p>Not enough planets are available for a mission.</p>
     </div>
     <div class="route-planner-content" v-else>
-      <h3 v-if="!departurePlanet">
-        Please select the planet you will start your mission from:
-      </h3>
+      <h3 v-if="!departurePlanet">Please select the planet you will start your mission from:</h3>
       <h3 v-else-if="departurePlanet && !endPlanet">
         Please select the planet you will go to during your mission:
       </h3>
-      <h3 v-else>
-        Mission selected: {{ departurePlanet.name }} - {{ endPlanet.name }}
-      </h3>
+      <h3 v-else>Mission selected: {{ departurePlanet.name }} - {{ endPlanet.name }}</h3>
       <div class="planet-info-container">
         <div class="planet-container">
           <div v-for="(planet, index) in planets" :key="planet.name" class="planet-section">
-            <button :class="setPlanetButtonCSSClass(planet)"
-                    @click="selectPlanet(planet)"
-                    @mouseover="hoverPlanet(planet)"
-                    @mouseleave="hoverPlanet(null)">
+            <button
+              :class="setPlanetButtonCSSClass(planet)"
+              @click="selectPlanet(planet)"
+              @mouseover="hoverPlanet(planet)"
+              @mouseleave="hoverPlanet(null)"
+            >
               {{ planet.name }}
             </button>
             <span v-if="index < planets.length - 1" class="distance-text">
-            {{ displayDistanceBetweenPlanets(planets[index], planets[index + 1]) }} millions km
-          </span>
+              {{ displayDistanceBetweenPlanets(planets[index], planets[index + 1]) }} millions km
+            </span>
           </div>
         </div>
         <div class="planet-description-container">
@@ -51,10 +49,10 @@
 </template>
 
 <script lang="ts">
-import {computed, type PropType, ref, watch} from 'vue'
+import { computed, type PropType, ref, watch } from 'vue'
 import { useStore } from 'vuex'
-import { type Planet, TypeOfCelestialObject } from "@/types/Planet.ts";
-import type { Spacecraft } from "@/types/Spacecraft.ts";
+import { type Planet, TypeOfCelestialObject } from '@/types/Planet.ts'
+import type { Spacecraft } from '@/types/Spacecraft.ts'
 
 export default {
   props: {
@@ -69,11 +67,11 @@ export default {
     const ROUND_TRIP_MULTIPLIER = 2
     const AVERAGE_WEIGHT_OF_PASSENGER = 70
     const MILLION = 1000000.0
-    const HALF_CIRCUMFERENCE = 1/2;
+    const HALF_CIRCUMFERENCE = 1 / 2
 
     const store = useStore()
 
-    const hoveredPlanet = ref<Planet | null>(null);
+    const hoveredPlanet = ref<Planet | null>(null)
     const planetsOnTheFinalWay = ref<Planet[] | null>(null)
     const planetsInRange = ref<Planet[] | null>(null)
     const missionDuration = computed({
@@ -88,15 +86,15 @@ export default {
       get: () => store.state.endPlanet,
       set: (value) => store.commit('setEndPlanet', value),
     })
-    const errorMessage = ref<string>("")
+    const errorMessage = ref<string>('')
     const selectedSpacecraft = computed({
       get: () => store.state.selectedSpacecraft,
       set: (value) => store.commit('setSelectedSpacecraft', value),
     })
 
     const hoverPlanet = (planet: Planet | null) => {
-      hoveredPlanet.value = planet;
-    };
+      hoveredPlanet.value = planet
+    }
 
     const selectPlanet = (planet: Planet) => {
       if (departurePlanet.value && departurePlanet.value.name === planet.name) {
@@ -109,42 +107,65 @@ export default {
         planetsOnTheFinalWay.value = null
         missionDuration.value = 0
         endPlanet.value = null
-        definePlanetRangeOfSpacecraft(departurePlanet.value);
-      } else if (departurePlanet.value && !endPlanet.value && planetsInRange.value && props.planets
-        && planetsInRange.value.some(planetInRange => planetInRange.name === planet.name)) {
-        endPlanet.value = planet;
-        planetsOnTheFinalWay.value = props.planets.filter(planet => isPlanetOnTheWay(departurePlanet.value, endPlanet.value, planet))
-        missionDuration.value = calculateMissionDuration(selectedSpacecraft.value, departurePlanet.value, endPlanet.value, planetsOnTheFinalWay.value)
-      } else if (!departurePlanet.value && isPlanetTemperatureFineForSpacecraft(selectedSpacecraft.value, planet) && planet.potentially_habitable) {
+        definePlanetRangeOfSpacecraft(departurePlanet.value)
+      } else if (
+        departurePlanet.value &&
+        !endPlanet.value &&
+        planetsInRange.value &&
+        props.planets &&
+        planetsInRange.value.some((planetInRange) => planetInRange.name === planet.name)
+      ) {
+        endPlanet.value = planet
+        planetsOnTheFinalWay.value = props.planets.filter((planet) =>
+          isPlanetOnTheWay(departurePlanet.value, endPlanet.value, planet),
+        )
+        missionDuration.value = calculateMissionDuration(
+          selectedSpacecraft.value,
+          departurePlanet.value,
+          endPlanet.value,
+          planetsOnTheFinalWay.value,
+        )
+      } else if (
+        !departurePlanet.value &&
+        isPlanetTemperatureFineForSpacecraft(selectedSpacecraft.value, planet) &&
+        planet.potentially_habitable
+      ) {
         departurePlanet.value = planet
-        definePlanetRangeOfSpacecraft(planet);
+        definePlanetRangeOfSpacecraft(planet)
       }
       setPlanetButtonCSSClass(planet)
     }
 
     const setPlanetButtonCSSClass = (planet: Planet) => {
-      const cssClassPlanetButton = ['planet-button'];
+      const cssClassPlanetButton = ['planet-button']
       if (departurePlanet.value) {
         if (departurePlanet.value.name === planet.name)
           cssClassPlanetButton.push('departure-planet')
         else if (endPlanet.value) {
-          if (planetsOnTheFinalWay.value && planetsOnTheFinalWay.value.some(planetOnTheFinalWay => planetOnTheFinalWay.name === planet.name))
+          if (
+            planetsOnTheFinalWay.value &&
+            planetsOnTheFinalWay.value.some(
+              (planetOnTheFinalWay) => planetOnTheFinalWay.name === planet.name,
+            )
+          )
             cssClassPlanetButton.push('on-the-way-planet')
-          else if (endPlanet.value.name === planet.name)
-            cssClassPlanetButton.push('end-planet')
-          else
-            cssClassPlanetButton.push('unavailable-planet')
+          else if (endPlanet.value.name === planet.name) cssClassPlanetButton.push('end-planet')
+          else cssClassPlanetButton.push('unavailable-planet')
         } else {
-          if (planetsInRange.value && planetsInRange.value.some(planetInRange => planetInRange.name === planet.name))
+          if (
+            planetsInRange.value &&
+            planetsInRange.value.some((planetInRange) => planetInRange.name === planet.name)
+          )
             cssClassPlanetButton.push('available-planet')
-          else
-            cssClassPlanetButton.push('forbidden-planet')
+          else cssClassPlanetButton.push('forbidden-planet')
         }
       } else {
-        if (isPlanetTemperatureFineForSpacecraft(selectedSpacecraft.value, planet) && planet.potentially_habitable)
+        if (
+          isPlanetTemperatureFineForSpacecraft(selectedSpacecraft.value, planet) &&
+          planet.potentially_habitable
+        )
           cssClassPlanetButton.push('available-planet')
-        else
-          cssClassPlanetButton.push('forbidden-planet')
+        else cssClassPlanetButton.push('forbidden-planet')
       }
       return cssClassPlanetButton
     }
@@ -159,82 +180,159 @@ export default {
       return (planet2.distance_from_sun_km - planet1.distance_from_sun_km) / MILLION
     }
 
-    const calculateMissionDuration = (spacecraft: Spacecraft, originPlanet: Planet, destinationPlanet: Planet, onTheWayPlanets: Planet[]) => {
-      return calculateMissionTotalRangeLoss(spacecraft, originPlanet, destinationPlanet, onTheWayPlanets) / spacecraft.travel_speed_km_per_hour;
-    }
-
-    const isPlanetTemperatureFineForSpacecraft = (spacecraft: Spacecraft, planet: Planet) => {
-      return !(planet.average_temperature_c >= spacecraft.operational_temperature_c_max ||
-        planet.average_temperature_c <= spacecraft.operational_temperature_c_min);
-    }
-
-    const isPlanetOnTheWay = (originPlanet: Planet, destinationPlanet: Planet, planetToCheck: Planet) => {
-      return ((planetToCheck.distance_from_sun_km > originPlanet.distance_from_sun_km
-          && planetToCheck.distance_from_sun_km < destinationPlanet.distance_from_sun_km)
-        || (planetToCheck.distance_from_sun_km < originPlanet.distance_from_sun_km
-          && planetToCheck.distance_from_sun_km > destinationPlanet.distance_from_sun_km)
+    const calculateMissionDuration = (
+      spacecraft: Spacecraft,
+      originPlanet: Planet,
+      destinationPlanet: Planet,
+      onTheWayPlanets: Planet[],
+    ) => {
+      return (
+        calculateMissionTotalRangeLoss(
+          spacecraft,
+          originPlanet,
+          destinationPlanet,
+          onTheWayPlanets,
+        ) / spacecraft.travel_speed_km_per_hour
       )
     }
 
-    const checkMissionsPlanetsTemperature =
-      (spacecraft: Spacecraft,
-       originPlanet: Planet,
-       destinationPlanet: Planet,
-       planetsOnTheWay: Planet[]) => {
-        return (isPlanetTemperatureFineForSpacecraft(spacecraft, originPlanet)
-          && isPlanetTemperatureFineForSpacecraft(spacecraft, destinationPlanet)
-          &&  planetsOnTheWay.every(planet => isPlanetTemperatureFineForSpacecraft(spacecraft, planet)))
-      }
+    const isPlanetTemperatureFineForSpacecraft = (spacecraft: Spacecraft, planet: Planet) => {
+      return !(
+        planet.average_temperature_c >= spacecraft.operational_temperature_c_max ||
+        planet.average_temperature_c <= spacecraft.operational_temperature_c_min
+      )
+    }
 
-    const calculateAtmosphericLossOfRange = (spacecraftVelocity: number, spacecraftMass: number, planet: Planet) => {
-      return planet.gravity_m_per_s2 * spacecraftMass / (KM_PER_HOURS_TO_M_PER_SECONDS * spacecraftVelocity)
+    const isPlanetOnTheWay = (
+      originPlanet: Planet,
+      destinationPlanet: Planet,
+      planetToCheck: Planet,
+    ) => {
+      return (
+        (planetToCheck.distance_from_sun_km > originPlanet.distance_from_sun_km &&
+          planetToCheck.distance_from_sun_km < destinationPlanet.distance_from_sun_km) ||
+        (planetToCheck.distance_from_sun_km < originPlanet.distance_from_sun_km &&
+          planetToCheck.distance_from_sun_km > destinationPlanet.distance_from_sun_km)
+      )
+    }
+
+    const checkMissionsPlanetsTemperature = (
+      spacecraft: Spacecraft,
+      originPlanet: Planet,
+      destinationPlanet: Planet,
+      planetsOnTheWay: Planet[],
+    ) => {
+      return (
+        isPlanetTemperatureFineForSpacecraft(spacecraft, originPlanet) &&
+        isPlanetTemperatureFineForSpacecraft(spacecraft, destinationPlanet) &&
+        planetsOnTheWay.every((planet) => isPlanetTemperatureFineForSpacecraft(spacecraft, planet))
+      )
+    }
+
+    const calculateAtmosphericLossOfRange = (
+      spacecraftVelocity: number,
+      spacecraftMass: number,
+      planet: Planet,
+    ) => {
+      return (
+        (planet.gravity_m_per_s2 * spacecraftMass) /
+        (KM_PER_HOURS_TO_M_PER_SECONDS * spacecraftVelocity)
+      )
     }
 
     // Units do not make any sense, I am reducing a distance (km) by ΔR (kg/s) but I don't get what I should have done
-    const calculateMissionTotalRangeLoss = (spacecraft: Spacecraft, originPlanet: Planet, destinationPlanet: Planet, planetsOnTheWay: Planet[]) => {
-      const totalMassOfSpacecraft = spacecraft.mass_kg + AVERAGE_WEIGHT_OF_PASSENGER * store.state.selectedNumberOfPassengers;
+    const calculateMissionTotalRangeLoss = (
+      spacecraft: Spacecraft,
+      originPlanet: Planet,
+      destinationPlanet: Planet,
+      planetsOnTheWay: Planet[],
+    ) => {
+      const totalMassOfSpacecraft =
+        spacecraft.mass_kg + AVERAGE_WEIGHT_OF_PASSENGER * store.state.selectedNumberOfPassengers
 
-      const totalDistance = ROUND_TRIP_MULTIPLIER *
-        (Math.abs(destinationPlanet.distance_from_sun_km - originPlanet.distance_from_sun_km)
-          + planetsOnTheWay.reduce((sum, current) => sum - current.diameter_km + (current.diameter_km * Math.PI * HALF_CIRCUMFERENCE), 0));
+      const totalDistance =
+        ROUND_TRIP_MULTIPLIER *
+        (Math.abs(destinationPlanet.distance_from_sun_km - originPlanet.distance_from_sun_km) +
+          planetsOnTheWay.reduce(
+            (sum, current) =>
+              sum - current.diameter_km + current.diameter_km * Math.PI * HALF_CIRCUMFERENCE,
+            0,
+          ))
 
-      const totalAtmosphericLossOfRange = calculateAtmosphericLossOfRange(spacecraft.travel_speed_km_per_hour, totalMassOfSpacecraft, originPlanet)
-        + calculateAtmosphericLossOfRange(spacecraft.travel_speed_km_per_hour, totalMassOfSpacecraft, destinationPlanet)
-        + ROUND_TRIP_MULTIPLIER * planetsOnTheWay.reduce((sum, current) => sum +
-          calculateAtmosphericLossOfRange(spacecraft.travel_speed_km_per_hour, totalMassOfSpacecraft, current), 0)
+      const totalAtmosphericLossOfRange =
+        calculateAtmosphericLossOfRange(
+          spacecraft.travel_speed_km_per_hour,
+          totalMassOfSpacecraft,
+          originPlanet,
+        ) +
+        calculateAtmosphericLossOfRange(
+          spacecraft.travel_speed_km_per_hour,
+          totalMassOfSpacecraft,
+          destinationPlanet,
+        ) +
+        ROUND_TRIP_MULTIPLIER *
+          planetsOnTheWay.reduce(
+            (sum, current) =>
+              sum +
+              calculateAtmosphericLossOfRange(
+                spacecraft.travel_speed_km_per_hour,
+                totalMassOfSpacecraft,
+                current,
+              ),
+            0,
+          )
 
-      return totalDistance + totalAtmosphericLossOfRange;
+      return totalDistance + totalAtmosphericLossOfRange
     }
 
-    const isPlanetInRange = (spacecraft: Spacecraft, originPlanet: Planet, planetToCheck: Planet) => {
-      if (!props.planets)
+    const isPlanetInRange = (
+      spacecraft: Spacecraft,
+      originPlanet: Planet,
+      planetToCheck: Planet,
+    ) => {
+      if (!props.planets) return false
+
+      const planetsOnTheWay = props.planets.filter((planet) =>
+        isPlanetOnTheWay(originPlanet, planetToCheck, planet),
+      )
+
+      if (
+        !checkMissionsPlanetsTemperature(spacecraft, originPlanet, planetToCheck, planetsOnTheWay)
+      )
         return false
 
-      const planetsOnTheWay = props.planets.filter(planet => isPlanetOnTheWay(originPlanet, planetToCheck, planet))
-
-      if (!checkMissionsPlanetsTemperature(spacecraft, originPlanet, planetToCheck, planetsOnTheWay))
-        return false
-
-      return spacecraft.range_km -
-        calculateMissionTotalRangeLoss(spacecraft, originPlanet, planetToCheck, planetsOnTheWay) > 0
+      return (
+        spacecraft.range_km -
+          calculateMissionTotalRangeLoss(spacecraft, originPlanet, planetToCheck, planetsOnTheWay) >
+        0
+      )
     }
 
     const definePlanetRangeOfSpacecraft = (originPlanet: Planet) => {
-      if (!props.planets)
-        return
-      planetsInRange.value = props.planets.filter(planet => planet.name !== originPlanet.name
-        && isPlanetInRange(selectedSpacecraft.value, originPlanet, planet))
+      if (!props.planets) return
+      planetsInRange.value = props.planets.filter(
+        (planet) =>
+          planet.name !== originPlanet.name &&
+          isPlanetInRange(selectedSpacecraft.value, originPlanet, planet),
+      )
     }
 
     watch([departurePlanet, endPlanet], ([newDeparture, newEnd]) => {
       if (newDeparture && newEnd && props.planets) {
-        planetsOnTheFinalWay.value = props.planets.filter(planet => isPlanetOnTheWay(newDeparture, newEnd, planet));
-        missionDuration.value = calculateMissionDuration(selectedSpacecraft.value, newDeparture, newEnd, planetsOnTheFinalWay.value);
+        planetsOnTheFinalWay.value = props.planets.filter((planet) =>
+          isPlanetOnTheWay(newDeparture, newEnd, planet),
+        )
+        missionDuration.value = calculateMissionDuration(
+          selectedSpacecraft.value,
+          newDeparture,
+          newEnd,
+          planetsOnTheFinalWay.value,
+        )
       } else {
-        planetsOnTheFinalWay.value = null;
-        missionDuration.value = 0;
+        planetsOnTheFinalWay.value = null
+        missionDuration.value = 0
       }
-    });
+    })
 
     return {
       errorMessage,
@@ -248,7 +346,7 @@ export default {
       displayDistanceBetweenPlanets,
       selectPlanet,
       displayMoons,
-      setPlanetButtonCSSClass
+      setPlanetButtonCSSClass,
     }
   },
 }
@@ -315,11 +413,11 @@ export default {
 }
 
 .end-planet {
-  background-color: #800080	;
+  background-color: #800080;
 }
 
 .end-planet:hover {
-  background-color: #9932CC;
+  background-color: #9932cc;
 }
 
 .unavailable-planet {
@@ -363,5 +461,4 @@ export default {
   align-items: center;
   justify-content: center;
 }
-
 </style>

@@ -10,7 +10,12 @@
         {{ spacecraftOption.name }}
       </option>
     </select>
-    <p v-if="!spacecraftOptions || !filteredSpacecraftsOptions || filteredSpacecraftsOptions.length === 0" class="message">
+    <p
+      v-if="
+        !spacecraftOptions || !filteredSpacecraftsOptions || filteredSpacecraftsOptions.length === 0
+      "
+      class="message"
+    >
       We currently do not provide spacecraft for this many people. Please select a smaller number of
       people for your mission.
     </p>
@@ -31,7 +36,7 @@
 <script lang="ts">
 import { computed, type PropType } from 'vue'
 import { useStore } from 'vuex'
-import type { Spacecraft } from "@/types/Spacecraft.ts";
+import type { Spacecraft } from '@/types/Spacecraft.ts'
 
 export default {
   props: {

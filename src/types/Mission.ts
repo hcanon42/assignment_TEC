@@ -1,5 +1,5 @@
-import type {Planet} from "@/types/Planet.ts";
-import type {Spacecraft} from "@/types/Spacecraft.ts";
+import type { Planet } from '@/types/Planet.ts'
+import type { Spacecraft } from '@/types/Spacecraft.ts'
 
 export interface Mission {
   name: string

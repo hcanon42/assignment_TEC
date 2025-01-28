@@ -1,6 +1,6 @@
 export enum TypeOfCelestialObject {
-  Planet = "Planet",
-  Star = "Star"
+  Planet = 'Planet',
+  Star = 'Star',
 }
 
 export interface Planet {

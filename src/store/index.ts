@@ -1,15 +1,15 @@
 import { createStore } from 'vuex'
-import type {Spacecraft} from "@/types/Spacecraft.ts";
-import type {Planet} from "@/types/Planet.ts";
-import type {Mission} from "@/types/Mission.ts";
+import type { Spacecraft } from '@/types/Spacecraft.ts'
+import type { Planet } from '@/types/Planet.ts'
+import type { Mission } from '@/types/Mission.ts'
 
 interface State {
-  selectedSpacecraft: Spacecraft | null,
-  selectedNumberOfPassengers: number;
-  departurePlanet: Planet | null;
-  endPlanet: Planet | null;
-  missionDuration: number;
-  savedMissions: Mission[];
+  selectedSpacecraft: Spacecraft | null
+  selectedNumberOfPassengers: number
+  departurePlanet: Planet | null
+  endPlanet: Planet | null
+  missionDuration: number
+  savedMissions: Mission[]
 }
 
 export default createStore({
@@ -19,7 +19,7 @@ export default createStore({
     departurePlanet: null,
     endPlanet: null,
     missionDuration: 0,
-    savedMissions: []
+    savedMissions: [],
   },
   mutations: {
     setSelectedSpacecraft(state: State, selectedSpacecraft: Spacecraft) {
@@ -46,7 +46,6 @@ export default createStore({
 
     setSavedMissions(state: State, missions: Mission[]) {
       state.savedMissions = missions
-
     },
   },
 })
