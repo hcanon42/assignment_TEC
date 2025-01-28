@@ -51,7 +51,7 @@
 </template>
 
 <script lang="ts">
-import { computed, type PropType, ref } from 'vue'
+import {computed, type PropType, ref, watch} from 'vue'
 import { useStore } from 'vuex'
 import { type Planet, TypeOfCelestialObject } from "@/types/Planet.ts";
 import type { Spacecraft } from "@/types/Spacecraft.ts";
@@ -109,6 +109,7 @@ export default {
         planetsOnTheFinalWay.value = null
         missionDuration.value = 0
         endPlanet.value = null
+        definePlanetRangeOfSpacecraft(departurePlanet.value);
       } else if (departurePlanet.value && !endPlanet.value && planetsInRange.value && props.planets
         && planetsInRange.value.some(planetInRange => planetInRange.name === planet.name)) {
         endPlanet.value = planet;
@@ -224,6 +225,16 @@ export default {
       planetsInRange.value = props.planets.filter(planet => planet.name !== originPlanet.name
         && isPlanetInRange(selectedSpacecraft.value, originPlanet, planet))
     }
+
+    watch([departurePlanet, endPlanet], ([newDeparture, newEnd]) => {
+      if (newDeparture && newEnd && props.planets) {
+        planetsOnTheFinalWay.value = props.planets.filter(planet => isPlanetOnTheWay(newDeparture, newEnd, planet));
+        missionDuration.value = calculateMissionDuration(selectedSpacecraft.value, newDeparture, newEnd, planetsOnTheFinalWay.value);
+      } else {
+        planetsOnTheFinalWay.value = null;
+        missionDuration.value = 0;
+      }
+    });
 
     return {
       errorMessage,
