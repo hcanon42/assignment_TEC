@@ -1,6 +1,6 @@
 <template>
   <div class="route-planner">
-    <h2>Plan your route</h2>
+    <h2>Mission your route</h2>
     <div v-if="!selectedSpacecraft">
       <p>Please select a spacecraft first.</p>
     </div>
@@ -14,34 +14,39 @@
       <h3 v-else-if="departurePlanet && !endPlanet">
         Please select the planet you will go to during your mission:
       </h3>
-      <div class="planet-container">
-        <div v-for="(planet, index) in planets" :key="planet.name" class="planet-section">
-          <button :class="setPlanetButtonCSSClass(planet)" @click="selectPlanet(planet)">
-            {{ planet.name }}
-          </button>
-          <span v-if="index < planets.length - 1" class="distance-text">
+      <h3 v-else>
+        Mission selected: {{ departurePlanet.name }} - {{ endPlanet.name }}
+      </h3>
+      <div class="planet-info-container">
+        <div class="planet-container">
+          <div v-for="(planet, index) in planets" :key="planet.name" class="planet-section">
+            <button :class="setPlanetButtonCSSClass(planet)"
+                    @click="selectPlanet(planet)"
+                    @mouseover="hoverPlanet(planet)"
+                    @mouseleave="hoverPlanet(null)">
+              {{ planet.name }}
+            </button>
+            <span v-if="index < planets.length - 1" class="distance-text">
             {{ displayDistanceBetweenPlanets(planets[index], planets[index + 1]) }} millions km
           </span>
+          </div>
+        </div>
+        <div class="planet-description-container">
+          <p v-if="!hoveredPlanet">
+            Hover a planet with your mouse to get additional information about it.
+          </p>
+          <p v-else>
+            Selected Planet: {{ hoveredPlanet.name }}<br /><br />
+            Average temperature: {{ hoveredPlanet.average_temperature_c }} °C<br />
+            Potentially habitable: {{ hoveredPlanet.potentially_habitable }}<br />
+            Weather patterns: {{ hoveredPlanet.weather_patterns }}<br />
+            Radiation levels: {{ hoveredPlanet.radiation_levels_msv }} millisieverts (mSv)<br />
+            Gravity: {{ hoveredPlanet.gravity_m_per_s2 }} m/s²<br />
+            Moons: {{ displayMoons(hoveredPlanet.moons) }}<br />
+          </p>
         </div>
       </div>
     </div>
-    <div v-if="departurePlanet">
-      <div v-if="departurePlanet.type === TypeOfCelestialObject.Planet">
-        <p>
-          Selected Planet: {{ departurePlanet.name }}<br /><br />
-          Average temperature: {{ departurePlanet.average_temperature_c }} °C<br />
-          Potentially habitable: {{ departurePlanet.potentially_habitable }}<br />
-          Weather patterns: {{ departurePlanet.weather_patterns }}<br />
-          Radiation levels: {{ departurePlanet.radiation_levels_msv }} millisieverts (mSv)<br />
-          Gravity: {{ departurePlanet.gravity_m_per_s2 }} m/s²<br />
-          Moons: {{ displayMoons(departurePlanet.moons) }}<br />
-        </p>
-      </div>
-      <div v-else>
-        <p>Please select a planet.</p>
-      </div>
-    </div>
-    <p v-if="errorMessage">{{ errorMessage }}</p>
   </div>
 </template>
 
@@ -50,7 +55,6 @@ import { computed, type PropType, ref } from 'vue'
 import { useStore } from 'vuex'
 import { type Planet, TypeOfCelestialObject } from "@/types/Planet.ts";
 import type { Spacecraft } from "@/types/Spacecraft.ts";
-import SpacecraftSelector from "@/components/SpacecraftSelector.vue";
 
 export default {
   props: {
@@ -65,8 +69,11 @@ export default {
     const ROUND_TRIP_MULTIPLIER = 2
     const AVERAGE_WEIGHT_OF_PASSENGER = 70
     const MILLION = 1000000.0
+    const HALF_CIRCUMFERENCE = 1/2;
 
     const store = useStore()
+
+    const hoveredPlanet = ref<Planet | null>(null);
     const planetsOnTheFinalWay = ref<Planet[] | null>(null)
     const planetsInRange = ref<Planet[] | null>(null)
     const missionDuration = computed({
@@ -82,13 +89,15 @@ export default {
       set: (value) => store.commit('setEndPlanet', value),
     })
     const errorMessage = ref<string>("")
-    const route = computed(() => store.state.route)
     const selectedSpacecraft = computed({
       get: () => store.state.selectedSpacecraft,
       set: (value) => store.commit('setSelectedSpacecraft', value),
     })
 
-    //todo: enlever le endPlanet devrait etre faisable
+    const hoverPlanet = (planet: Planet | null) => {
+      hoveredPlanet.value = planet;
+    };
+
     const selectPlanet = (planet: Planet) => {
       if (departurePlanet.value && departurePlanet.value.name === planet.name) {
         departurePlanet.value = null
@@ -96,16 +105,18 @@ export default {
         missionDuration.value = 0
         endPlanet.value = null
         planetsInRange.value = null
-      } else if (departurePlanet.value && planetsInRange.value && props.planets
+      } else if (endPlanet.value && endPlanet.value.name === planet.name) {
+        planetsOnTheFinalWay.value = null
+        missionDuration.value = 0
+        endPlanet.value = null
+      } else if (departurePlanet.value && !endPlanet.value && planetsInRange.value && props.planets
         && planetsInRange.value.some(planetInRange => planetInRange.name === planet.name)) {
         endPlanet.value = planet;
         planetsOnTheFinalWay.value = props.planets.filter(planet => isPlanetOnTheWay(departurePlanet.value, endPlanet.value, planet))
         missionDuration.value = calculateMissionDuration(selectedSpacecraft.value, departurePlanet.value, endPlanet.value, planetsOnTheFinalWay.value)
-      } else if (isPlanetTemperatureFineForSpacecraft(selectedSpacecraft.value, planet) && planet.potentially_habitable) {
+      } else if (!departurePlanet.value && isPlanetTemperatureFineForSpacecraft(selectedSpacecraft.value, planet) && planet.potentially_habitable) {
         departurePlanet.value = planet
         definePlanetRangeOfSpacecraft(planet);
-      } else {
-        errorMessage.value = `${planet.name} cannot be starting planet (either the planet is not habitable or the spacecraft you select do not withstand the conditions of the planet).`
       }
       setPlanetButtonCSSClass(planet)
     }
@@ -178,15 +189,13 @@ export default {
       return planet.gravity_m_per_s2 * spacecraftMass / (KM_PER_HOURS_TO_M_PER_SECONDS * spacecraftVelocity)
     }
 
-    //TODO: calculer la circonference au lieu du diametre
-
     // Units do not make any sense, I am reducing a distance (km) by ΔR (kg/s) but I don't get what I should have done
     const calculateMissionTotalRangeLoss = (spacecraft: Spacecraft, originPlanet: Planet, destinationPlanet: Planet, planetsOnTheWay: Planet[]) => {
       const totalMassOfSpacecraft = spacecraft.mass_kg + AVERAGE_WEIGHT_OF_PASSENGER * store.state.selectedNumberOfPassengers;
 
       const totalDistance = ROUND_TRIP_MULTIPLIER *
         (Math.abs(destinationPlanet.distance_from_sun_km - originPlanet.distance_from_sun_km)
-          + planetsOnTheWay.reduce((sum, current) => sum + current.diameter_km, 0));
+          + planetsOnTheWay.reduce((sum, current) => sum - current.diameter_km + (current.diameter_km * Math.PI * HALF_CIRCUMFERENCE), 0));
 
       const totalAtmosphericLossOfRange = calculateAtmosphericLossOfRange(spacecraft.travel_speed_km_per_hour, totalMassOfSpacecraft, originPlanet)
         + calculateAtmosphericLossOfRange(spacecraft.travel_speed_km_per_hour, totalMassOfSpacecraft, destinationPlanet)
@@ -219,11 +228,12 @@ export default {
     return {
       errorMessage,
       selectedSpacecraft,
-      route,
       departurePlanet,
       planetsInRange,
       endPlanet,
+      hoveredPlanet,
       TypeOfCelestialObject,
+      hoverPlanet,
       displayDistanceBetweenPlanets,
       selectPlanet,
       displayMoons,
@@ -235,6 +245,7 @@ export default {
 
 <style scoped>
 .route-planner {
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -245,6 +256,7 @@ export default {
 }
 
 .planet-container {
+  min-width: 50%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -320,13 +332,25 @@ export default {
 }
 
 .distance-text {
-  margin: 8px 0;
-  font-size: 0.9rem;
+  margin: 16px 0 8px;
+  font-size: 14px;
   color: #555;
 }
 
 .route-planner-content {
   width: 100%;
+}
+
+.planet-info-container {
+  display: flex;
+}
+
+.planet-description-container {
+  min-width: 50%;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 </style>

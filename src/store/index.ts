@@ -1,6 +1,16 @@
 import { createStore } from 'vuex'
 import type {Spacecraft} from "@/types/Spacecraft.ts";
 import type {Planet} from "@/types/Planet.ts";
+import type {Mission} from "@/types/Mission.ts";
+
+interface State {
+  selectedSpacecraft: Spacecraft | null,
+  selectedNumberOfPassengers: number;
+  departurePlanet: Planet | null;
+  endPlanet: Planet | null;
+  missionDuration: number;
+  savedMissions: Mission[];
+}
 
 export default createStore({
   state: {
@@ -9,35 +19,34 @@ export default createStore({
     departurePlanet: null,
     endPlanet: null,
     missionDuration: 0,
+    savedMissions: []
   },
   mutations: {
-    setSelectedSpacecraft(state, selectedSpacecraft: Spacecraft) {
+    setSelectedSpacecraft(state: State, selectedSpacecraft: Spacecraft) {
       state.selectedSpacecraft = selectedSpacecraft
+      state.departurePlanet = null
+      state.endPlanet = null
     },
 
-    setSelectedNumberOfPassengers(state, selectedNumberOfPassengers: number) {
+    setSelectedNumberOfPassengers(state: State, selectedNumberOfPassengers: number) {
       state.selectedNumberOfPassengers = selectedNumberOfPassengers
     },
 
-    setDeparturePlanet(state, departurePlanet: Planet) {
+    setDeparturePlanet(state: State, departurePlanet: Planet) {
       state.departurePlanet = departurePlanet
     },
 
-    setEndPlanet(state, endPlanet: Planet) {
+    setEndPlanet(state: State, endPlanet: Planet) {
       state.endPlanet = endPlanet
     },
 
-    setMissionDuration(state, missionDuration: number) {
+    setMissionDuration(state: State, missionDuration: number) {
       state.missionDuration = missionDuration
     },
 
-    savePlan(state, plan) {
-      state.savedPlans.push(plan)
-      localStorage.setItem('savedPlans', JSON.stringify(state.savedPlans))
-    },
-    loadSavedPlans(state) {
-      const saved = localStorage.getItem('savedPlans')
-      if (saved) state.savedPlans = JSON.parse(saved)
+    setSavedMissions(state: State, missions: Mission[]) {
+      state.savedMissions = missions
+
     },
   },
 })

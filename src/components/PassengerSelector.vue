@@ -32,7 +32,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 16px;
+  padding: 0 16px;
   background-color: #fff;
   border-radius: 8px;
 }

@@ -15,6 +15,10 @@
         <div>
           <MissionSummary />
         </div>
+
+        <div>
+          <MissionLoader />
+        </div>
       </div>
 
       <div class="column">
@@ -36,6 +40,7 @@ import { onMounted, ref } from 'vue'
 import type {Spacecraft} from "@/types/Spacecraft.ts";
 import type {Planet} from "@/types/Planet.ts";
 import MissionSummary from "@/components/MissionSummary.vue";
+import MissionLoader from "@/components/MissionLoader.vue";
 
 export default {
   setup() {
@@ -64,6 +69,7 @@ export default {
   },
 
   components: {
+    MissionLoader,
     MissionSummary,
     SpacecraftSelector,
     PassengerSelector,
@@ -75,13 +81,13 @@ export default {
 
 <style scoped>
 .mission-planner {
+  width: calc(100vw - 64px);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 32px;
   background-color: #f9f9f9;
-  font-family: Arial, sans-serif;
 }
 
 h1 {
@@ -97,13 +103,14 @@ h1 {
   display: flex;
   gap: 32px;
   margin-top: 24px;
+  flex-wrap: wrap;
 }
 
 .column {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   padding: 24px;
   border: 1px solid #ddd;
   border-radius: 8px;

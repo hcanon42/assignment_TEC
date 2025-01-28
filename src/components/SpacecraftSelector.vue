@@ -10,7 +10,7 @@
         {{ spacecraftOption.name }}
       </option>
     </select>
-    <p v-if="!spacecraftOptions || filteredSpacecraftsOptions.length === 0" class="message">
+    <p v-if="!spacecraftOptions || !filteredSpacecraftsOptions || filteredSpacecraftsOptions.length === 0" class="message">
       We currently do not provide spacecraft for this many people. Please select a smaller number of
       people for your mission.
     </p>
@@ -80,14 +80,8 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding: 16px;
+  padding: 0 16px;
   background-color: #fff;
-}
-
-h2 {
-  font-size: 24px;
-  margin-bottom: 16px;
-  color: #333;
 }
 
 .spacecraft-select {
@@ -108,10 +102,5 @@ h2 {
 .message {
   font-size: 14px;
   color: #777;
-}
-
-.spacecraft-details {
-  font-size: 14px;
-  color: #333;
 }
 </style>
